@@ -1,0 +1,29 @@
+parameters:
+  - name: environment
+    type: string
+  - name: tfFolder
+    type: string
+
+jobs:
+  - job: Terraform_${{ parameters.environment }}
+    displayName: "Terraform ${{ parameters.environment }}"
+    steps:
+      - task: TerraformTask@5
+        displayName: Terraform Init
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'Azure subscription 1(9117002a-2308-428d-993b-9f46dfdfd10c)'
+          backendAzureRmResourceGroupName: 'infra-rg'
+          backendAzureRmStorageAccountName: 'mystorageaccount199546'
+          backendAzureRmContainerName: 'mycontainer'
+          backendAzureRmKey: '${{ parameters.environment }}.tfstate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/${{ parameters.environment }}'
+
+      - task: TerraformTask@5
+        displayName: Terraform Plan
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          environmentServiceNameAzureRM: 'Azure subscription 1(9117002a-2308-428d-993b-9f46dfdfd10c)'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/${{ parameters.environment }}'
